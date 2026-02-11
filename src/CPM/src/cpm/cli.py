@@ -1,13 +1,11 @@
-# src/your_package_name/cli.py
+import typer
 
-import sys
+from .cpm import greet
 
-def main():
-    if len(sys.argv) > 1:
-        name = sys.argv[1]
-        print(f"Hello, {name}!")
-    else:
-        print("Hello, world!")
+
+app = typer.Typer()
+app.command()(cpm)
+
 
 if __name__ == "__main__":
-    main()
+    app()
