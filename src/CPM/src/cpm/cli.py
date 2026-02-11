@@ -1,6 +1,6 @@
 import typer
 
-from .cpm import greet
+from .cpm import cpm
 
 
 app = typer.Typer()

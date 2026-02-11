@@ -8,7 +8,8 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "typer"
+    "typer",
+    "typing_extensions"
 ]
 
 [project.scripts]
