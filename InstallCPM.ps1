@@ -8,7 +8,7 @@ $env:Path = "$HOME\.local\bin;$env:Path"
 Invoke-WebRequest -Uri "https://github.com/godsanchez/InstallTest/archive/refs/heads/main.zip"-OutFile ./main.zip
 
 # Unzip the package
-Expand-Archive -Path ./main.zip -DestinationPath ./CPMInstall
+Expand-Archive -Path ./main.zip -DestinationPath ./CPMInstall  -ErrorAction SilentlyContinue
 
 # Install the package using uv
 uv tool install ./CPMInstall/InstallTest-main/src/CPM
