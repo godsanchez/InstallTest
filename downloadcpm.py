@@ -12,10 +12,11 @@ from azure.identity import InteractiveBrowserCredential
 from azure.storage.blob import BlobClient
 
 # Replace with your actual values
-STORAGE_ACCOUNT_URL = "https://virtualclientinternal.blob.core.windows.net"
-CONTAINER_NAME = "packages"
-BLOB_NAME = "3DMark.zip"
-DOWNLOAD_PATH = "./3DMark.zip"
+STORAGE_ACCOUNT_URL = "https://crcportalstoragedev.blob.core.windows.net"
+CONTAINER_NAME = "cpm"
+BLOB_NAME = "ganymedepackagemanager-0.1.0.tar.gz"
+DOWNLOAD_PATH = "./ganymedepackagemanager-0.1.0.tar.gz"
+
 
 def download_blob_with_msal_auth(account_url, container_name, blob_name, download_path):
     """
