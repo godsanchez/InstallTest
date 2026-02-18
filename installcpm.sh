@@ -3,6 +3,9 @@
 # Install uv tool for python package management
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# Update path to point to uv
+export PATH="$HOME/.local/bin:$PATH"
+
 # Download cross-platform Python download script
 wget "https://aka.ms/CPMDownload" -O ./downloadcpm.py
 
