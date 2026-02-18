@@ -3,12 +3,11 @@
 # Install uv tool for python package management
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Download cpm package
-wget "https://github.com/godsanchez/InstallTest/archive/refs/heads/main.zip" -O ./main.zip
+# Download cross-platform Python download script
+wget "https://aka.ms/CPMDownload" -O ./downloadcpm.py
 
-# Unzip the package
-unzip ./main.zip -d ./CPMInstall
+# Download cpm package
+uv run ./downloadcpm.py
 
 # Install the package using uv
-uv tool install ./CPMInstall/InstallTest-main/src/CPM
-
+uv tool install ./ganymedepackagemanager-0.1.0.tar.gz
