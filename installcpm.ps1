@@ -1,5 +1,5 @@
 # Default Portal values
-$BLOB_PREFIX = "cpm/ganymedepackagemanager"
+$BLOB_PREFIX = "cpm/crcpackagemanager"
 $DOWNLOAD_PATH = "."
 $STORAGE_ACCOUNT_URL = "https://crcportalstoragedev.blob.core.windows.net"
 $CONTAINER_NAME = "assets"
@@ -17,7 +17,7 @@ Invoke-WebRequest -Uri "https://aka.ms/CPMDownload" -OutFile ./downloadblob.py
 uv run .\downloadblob.py --blob-prefix $BLOB_PREFIX --download-path $DOWNLOAD_PATH --account-url $STORAGE_ACCOUNT_URL --container-name $CONTAINER_NAME
 
 # Find latest package in download path
-$PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_PATH -Filter "ganymedepackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
+$PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_PATH -Filter "crcpackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
 
 # Install the package using uv, with bytecode compilation for faster imports
 uv tool install --compile-bytecode $PACKAGE_PATH
