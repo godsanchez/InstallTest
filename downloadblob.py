@@ -14,12 +14,12 @@ from azure.storage.blob import BlobServiceClient
 parser = argparse.ArgumentParser(description="A script to download blobs from Azure Blob Storage.")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("--blob-name", type=str, help="The filename of the blob to download (including subpath and filename).")
-group.add_argument("--blob-prefix", type=str, help="The prefix of the blob to download. The newest version will be selected.")
+group.add_argument("--blob-prefix", type=str, help="The prefix of the blob to download (including subpath and filename). The newest-versioned filename will be selected.")
 parser.add_argument("--download-path", type=str, help="The local folder path to save the downloaded blob.")
 parser.add_argument("--account-url", type=str, help="The URL of the storage account (e.g., https://myaccount.blob.core.windows.net).")
 parser.add_argument("--container-name", type=str, help="The name of the blob container (e.g. assets).")
 
-def download_blob_with_msal_auth(account_url: str, container_name: str, blob_name: str = None, blob_prefix: str = None, download_path: str = "."):
+def download_blob_with_msal_auth(account_url: str, container_name: str, blob_name: str = str(), blob_prefix: str = str(), download_path: str = "."):
     """
     Downloads a blob from Azure Blob Storage using Microsoft Entra ID authentication.
     """
