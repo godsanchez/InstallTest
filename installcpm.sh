@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Default Portal values
-$BLOB_PREFIX = "51/51cebd40-e56d-4c90-9dbb-c58e1e64b2c7/3/crcpackagemanager"
+$BLOB_PREFIX = "44/4464b461-ed11-41f5-98b7-2f5c40b76c19/5/crcpackagemanager"
 DOWNLOAD_PATH="."
-STORAGE_ACCOUNT_URL="https://crcportalstorage.blob.core.windows.net"
+STORAGE_ACCOUNT_URL="https://crcportalstoragedev.blob.core.windows.net"
 CONTAINER_NAME="assets"
 
 # Install uv tool for python package management
