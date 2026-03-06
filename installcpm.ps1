@@ -1,5 +1,6 @@
 # Default Portal values
 $BLOB_PREFIX = "44/4464b461-ed11-41f5-98b7-2f5c40b76c19/7/crcpackagemanager"
+$BLOB_NAME = "44/4464b461-ed11-41f5-98b7-2f5c40b76c19/7/crcpackagemanager-0.1.4.tar.gz"
 $DOWNLOAD_PATH = "."
 $STORAGE_ACCOUNT_URL = "https://crcportalstoragedev.blob.core.windows.net"
 $CONTAINER_NAME = "assets"
@@ -14,7 +15,7 @@ $env:Path = "$HOME\.local\bin;$env:Path"
 Invoke-WebRequest -Uri "https://aka.ms/CPMDownload" -OutFile ./downloadblob.py
 
 # Download cpm package
-uv run .\downloadblob.py --blob-prefix $BLOB_PREFIX --download-path $DOWNLOAD_PATH --account-url $STORAGE_ACCOUNT_URL --container-name $CONTAINER_NAME
+uv run .\downloadblob.py --blob-name $BLOB_NAME --download-path $DOWNLOAD_PATH --account-url $STORAGE_ACCOUNT_URL --container-name $CONTAINER_NAME
 
 # Find latest package in download path
 $PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_PATH -Filter "crcpackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
