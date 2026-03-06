@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default Portal values
-BLOB_PREFIX="cpm/crcpackagemanager"
+$BLOB_PREFIX = "51/51cebd40-e56d-4c90-9dbb-c58e1e64b2c7/2/crcpackagemanager"
 DOWNLOAD_PATH="."
 STORAGE_ACCOUNT_URL="https://crcportalstoragedev.blob.core.windows.net"
 CONTAINER_NAME="assets"
