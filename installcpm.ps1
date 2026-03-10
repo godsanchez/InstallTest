@@ -1,15 +1,15 @@
 # CRC Package Manager values
 $CPM_GUID = "51cebd40-e56d-4c90-9dbb-c58e1e64b2c7"
-$DOWNLOAD_FOLDER = "./cpm-install"
+$DOWNLOAD_PATH = "./"
 
 # Download cross-platform Python download script
 Invoke-WebRequest -Uri "https://aka.ms/CPMDownload" -OutFile ./downloadblob.py
 
 # Download cpm package
-uv run .\downloadblob.py --package-guid $CPM_GUID --download-path $DOWNLOAD_FOLDER
+uv run .\downloadblob.py --package-guid $CPM_GUID --download-path $DOWNLOAD_PATH
 
 # Find latest package in download path
-$PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_FOLDER -Filter "crcpackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
+$PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_PATH -Filter "crcpackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
 
 # Install uv tool for python package management
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex | Out-Null" 
@@ -22,5 +22,6 @@ $env:AZURE_TOKEN_CREDENTIALS = "AzureCliCredential"
 uv tool install $PACKAGE_PATH
 
 # Cleanup - remove the downloaded package and scripts
-Remove-Item -Path $DOWNLOAD_FOLDER -Recurse -Force
+Remove-Item -Path $PACKAGE_PATH
+Remove-Item -Path "$DOWNLOAD_PATH/downloadblob.py"
 Remove-Item -Path $MyInvocation.MyCommand.Path
