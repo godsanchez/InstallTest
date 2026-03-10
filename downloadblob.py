@@ -40,12 +40,13 @@ crc_token_cache = PersistedTokenCache(persistence)
 
 parser = argparse.ArgumentParser(description="A script to download blobs from Azure Blob Storage.")
 group = parser.add_argument_group()
-group.add_argument("--package-guid", type=str, help="The guid of the blob to download.")
-group.add_argument("--download-path", type=str, help="The destination path for the blob to download.")
-group.add_argument("--api-url", type=str, help="The API URL for the blob storage.", default=API_URL)
-group.add_argument("--sas-token-endpoint", type=str, help="The SAS token endpoint for the blob storage.", default=SAS_TOKEN_ENDPOINT)
-group.add_argument("--metadata-endpoint", type=str, help="The metadata endpoint for the blob storage.", default=METADATA_ENDPOINT)
-group.add_argument("--document-endpoint", type=str, help="The document endpoint for the blob storage.", default=DOCUMENT_ENDPOINT)
+group.add_argument("--package-guid", type=str, help="The guid of the asset to download.")
+group.add_argument("--download-path", type=str, help="The destination path for the asset to download.")
+group.add_argument("--version", type=str, help="The version of the asset to download.", default=str())
+group.add_argument("--api-url", type=str, help="The API URL for the Ganymede API.", default=API_URL)
+group.add_argument("--sas-token-endpoint", type=str, help="The SAS token endpoint for the Ganymede API.", default=SAS_TOKEN_ENDPOINT)
+group.add_argument("--metadata-endpoint", type=str, help="The metadata endpoint for the Ganymede API.", default=METADATA_ENDPOINT)
+group.add_argument("--document-endpoint", type=str, help="The document endpoint for the Ganymede API.", default=DOCUMENT_ENDPOINT)
 group.add_argument("--client-id", type=str, help="The client ID for authentication.", default=CLIENT_ID)
 group.add_argument("--scope", type=str, help="The scope for authentication.", default=SCOPE)
 group.add_argument("--tenant-id", type=str, help="The tenant ID for authentication.", default=TENANT_ID)
@@ -305,4 +306,4 @@ def download_blob_url_with_sas_token(blob_url, sas_token, download_path) -> str:
 
 
 if __name__ == "__main__":
-    download_path = download_asset(asset_guid=args.package_guid)
+    download_path = download_asset(asset_guid=args.package_guid, version=args.version, download_path=args.download_path)
