@@ -2,6 +2,10 @@
 $CPM_GUID = "51cebd40-e56d-4c90-9dbb-c58e1e64b2c7"
 $DOWNLOAD_PATH = "./"
 
+Write-Host "Starting CRC Package Manager installation..." -ForegroundColor Green
+Write-Host ""
+Write-Host "Installing dependencies..." -ForegroundColor Green
+
 # Download cross-platform Python download script
 Invoke-WebRequest -Uri "https://aka.ms/CPMDownload" -OutFile ./downloadblob.py
 
@@ -17,6 +21,10 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 # Update user path to point to uv
 $env:Path = "$HOME\.local\bin;$env:Path"
 $env:AZURE_TOKEN_CREDENTIALS = "AzureCliCredential"
+
+Write-Host "Dependencies installed." -ForegroundColor Green
+Write-Host ""
+Write-Host "Installing CRC Package Manager..." -ForegroundColor Green
 
 # Install the package using uv
 uv tool install $PACKAGE_PATH
