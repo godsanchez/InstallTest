@@ -1,24 +1,27 @@
-# Default Portal values
-$BLOB_PREFIX = "44/4464b461-ed11-41f5-98b7-2f5c40b76c19/8/crcpackagemanager"
-$BLOB_NAME = "44/4464b461-ed11-41f5-98b7-2f5c40b76c19/8/crcpackagemanager-0.1.4.tar.gz"
-$DOWNLOAD_PATH = "."
-$STORAGE_ACCOUNT_URL = "https://crcportalstoragedev.blob.core.windows.net"
-$CONTAINER_NAME = "assets"
-
-# Install uv tool for python package management
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex" 
-
-# Update user path to point to uv
-$env:Path = "$HOME\.local\bin;$env:Path"
+# CRC Package Manager values
+$CPM_GUID = "51cebd40-e56d-4c90-9dbb-c58e1e64b2c7"
+$DOWNLOAD_PATH = "./"
 
 # Download cross-platform Python download script
 Invoke-WebRequest -Uri "https://aka.ms/CPMDownload" -OutFile ./downloadblob.py
 
 # Download cpm package
-uv run .\downloadblob.py --blob-name $BLOB_NAME --download-path $DOWNLOAD_PATH --account-url $STORAGE_ACCOUNT_URL --container-name $CONTAINER_NAME
+uv run .\downloadblob.py --package-guid $CPM_GUID --download-path $DOWNLOAD_PATH
 
 # Find latest package in download path
 $PACKAGE_PATH = Get-ChildItem -Path $DOWNLOAD_PATH -Filter "crcpackagemanager-*" | Sort-Object -Descending | Select-Object -First 1
 
-# Install the package using uv, with bytecode compilation for faster imports
-uv tool install --compile-bytecode $PACKAGE_PATH
+# Install uv tool for python package management
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex | Out-Null" 
+
+# Update user path to point to uv
+$env:Path = "$HOME\.local\bin;$env:Path"
+$env:AZURE_TOKEN_CREDENTIALS = "AzureCliCredential"
+
+# Install the package using uv
+uv tool install $PACKAGE_PATH
+
+# Cleanup - remove the downloaded package and scripts
+Remove-Item -Path $PACKAGE_PATH
+Remove-Item -Path "$DOWNLOAD_PATH/downloadblob.py"
+Remove-Item -Path $MyInvocation.MyCommand.Path
