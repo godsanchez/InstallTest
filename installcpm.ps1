@@ -34,6 +34,8 @@ Remove-Item -Path $PACKAGE_PATH
 Remove-Item -Path "$DOWNLOAD_PATH/downloadblob.py"
 Remove-Item -Path $MyInvocation.MyCommand.Path
 
+Write-Host ""
 Write-Host "CRC Package Manager installed. Please type the following to see available commands:" -ForegroundColor Green
 Write-Host ""
 Write-Host "crc --help" -ForegroundColor Blue
+Write-Host ""
