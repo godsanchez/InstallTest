@@ -68,7 +68,7 @@ Catch
 # Install the package using uv
 Try
 {
-    uv tool install $PACKAGE_PATH
+    uv tool install --force $PACKAGE_PATH
 }
 Catch
 {
