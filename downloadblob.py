@@ -14,7 +14,7 @@ import shutil
 import argparse
 import requests
 from azure.storage.blob import BlobClient
-from msal import PublicClientApplication
+from msal import ConfidentialClientApplication, PublicClientApplication
 from msal_extensions import build_encrypted_persistence, PersistedTokenCache
 from rich import print
 
@@ -60,7 +60,9 @@ def get_ganymede_rest_token(client_id: str, tenant_id: str, scope: list[str]) ->
     """
 
     # Set up variables for Microsoft User Delegation authentication using MSAL
+    client_secret = os.environ.get("AZURE_CLIENT_SECRET")
     authority = f"https://login.microsoftonline.com/{tenant_id}"
+    result = None
 
     app = PublicClientApplication(
         client_id=client_id,
@@ -68,26 +70,46 @@ def get_ganymede_rest_token(client_id: str, tenant_id: str, scope: list[str]) ->
         token_cache=crc_token_cache
     )
 
-    # First, try to get a token silently from the cache
-    accounts = app.get_accounts()
-    result = None
-
-    if accounts:
-        result = app.acquire_token_silent(scope, account=accounts[0])
-
-    # If silent acquisition fails, fall back to interactive authentication
-    if not result:
-        result = app.acquire_token_interactive(
-            scopes=scope
+    # If client secret is available, use Confidential Client Application for unattended auth
+    if client_secret:
+        app = ConfidentialClientApplication(
+            client_id=client_id,
+            authority=authority,
+            client_credential=client_secret,
+            token_cache=crc_token_cache
+        )
+        result = app.acquire_token_silent(scopes=scope, account=None)
+        if not result:
+            result = app.acquire_token_for_client(scopes=scope)
+    
+    # Fallback to Public Client Application for interactive auth
+    else:
+        app = PublicClientApplication(
+            client_id=client_id,
+            authority=authority,
+            token_cache=crc_token_cache
         )
 
-    if isinstance(result, dict) and "access_token" in result:
-        access_token = result["access_token"]
-        return access_token
+        # First, try to get a token silently from the cache
+        accounts = app.get_accounts()
+        
+        if accounts:
+            result = app.acquire_token_silent(scope, account=accounts[0])
+
+        # If silent acquisition fails, fall back to interactive authentication
+        if not result:
+            result = app.acquire_token_interactive(
+                scopes=scope
+            )
+
+    if isinstance(result, dict):
+        if "access_token" in result:
+            access_token = result["access_token"]
+            return access_token
+        else:
+            raise Exception(f"Authentication failed. Error: {result.get('error')}, Description: {result.get('error_description')}")
     else:
-        print(result.get("error"))
-        print(result.get("error_description"))
-        return str()
+        raise Exception("Authentication failed. No token obtained.")
 
 def get_ganymede_rest_response(api_url:str, endpoint:str, token:str, params:dict={}) -> requests.Response:
     """
@@ -297,7 +319,7 @@ def download_blob_url_with_sas_token(blob_url, sas_token, download_path) -> str:
             for chunk in download_stream.chunks():
                 download_file.write(chunk)
     except Exception as e:
-        print(f"Failed to download blob from URL: {full_blob_url}. Error: {e}")
+        print(f"Failed to download blob from URL: {blob_url}. Error: {e}")
         return str()
     
     print(f"Successfully downloaded {blob_client.blob_name} to {download_path}.")
