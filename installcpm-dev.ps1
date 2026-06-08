@@ -1,5 +1,5 @@
 # CRC Package Manager values
-$CPM_GUID = "51cebd40-e56d-4c90-9dbb-c58e1e64b2c7"
+$CPM_GUID = "4464b461-ed11-41f5-98b7-2f5c40b76c19"
 $DOWNLOAD_PATH = "./"
 
 Function Exit-WithError
