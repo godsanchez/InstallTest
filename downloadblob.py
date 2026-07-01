@@ -4,7 +4,8 @@
 #  "azure-storage-blob",
 #  "msal",
 #  "msal-extensions",
-#  "rich"
+#  "rich",
+#  "pygobject"
 # ]
 # ///
 
