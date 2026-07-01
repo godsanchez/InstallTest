@@ -16,7 +16,7 @@ echo ""
 echo -e "\033[0;32mInstalling dependencies...\033[0m"
 
 # Download cross-platform Python download script
-wget --timeout=10 "https://aka.ms/CPMDownload" -O ./downloadblob.py || error_exit "Failed to download dependency installer script."
+curl -fL --max-time 10 --output ./downloadblob.py "https://aka.ms/CPMDownload" || error_exit "Failed to download dependency installer script."
 
 # Install uv tool for python package management
 curl -LsSf https://astral.sh/uv/install.sh | sh || error_exit "Failed to install uv tool for python package management."
