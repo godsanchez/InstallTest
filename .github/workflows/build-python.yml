@@ -4,13 +4,16 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/**"
+      - "$source_directory/**"
       - ".github/workflows/build-python.yml"
   pull_request:
     paths:
-      - "src/**"
+      - "$source_directory/**"
       - ".github/workflows/build-python.yml"
   workflow_dispatch:
+
+env:
+  source_directory: "src"
 
 jobs:
   discover:
@@ -26,7 +29,7 @@ jobs:
       - name: Find pyproject.toml directories under src
         id: find
         run: |
-          projects=$(find src -mindepth 1 -maxdepth 2 -name pyproject.toml -printf '%h\n' \
+          projects=$(find "$source_directory" -mindepth 1 -maxdepth 2 -name pyproject.toml -printf '%h\n' \
             | sort -u \
             | jq -R -s -c 'split("\n") | map(select(length > 0))')
           count=$(echo "$projects" | jq 'length')
