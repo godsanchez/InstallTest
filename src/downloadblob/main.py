@@ -1,3 +1,5 @@
+import downloadblob
+
 def main():
     print("Hello from downloadblob!")
 
