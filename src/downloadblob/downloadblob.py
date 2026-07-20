@@ -390,5 +390,9 @@ def download_blob_url_with_sas_token(blob_url, sas_token, download_path) -> str:
     return download_path
 
 
+def main():
+    download_asset(asset_guid=args.package_guid, version=args.version, download_path=args.download_path)
+
+
 if (__name__ == "__main__"):
-    download_path = download_asset(asset_guid=args.package_guid, version=args.version, download_path=args.download_path)
+    main()
