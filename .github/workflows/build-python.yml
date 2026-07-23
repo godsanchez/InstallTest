@@ -6,10 +6,6 @@ on:
     paths:
       - "$source_directory/**"
       - ".github/workflows/build-python.yml"
-  pull_request:
-    paths:
-      - "$source_directory/**"
-      - ".github/workflows/build-python.yml"
   workflow_dispatch:
 
 env:
