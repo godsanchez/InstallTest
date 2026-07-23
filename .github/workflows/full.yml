@@ -65,7 +65,7 @@ jobs:
 
       - name: Run Pytest
         run: |
-          pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src tests/
+          pytest --junitxml=pytest.xml
   
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
