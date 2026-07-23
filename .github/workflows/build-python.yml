@@ -2,7 +2,7 @@ name: Build Python Projects
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "$source_directory/**"
       - ".github/workflows/build-python.yml"
