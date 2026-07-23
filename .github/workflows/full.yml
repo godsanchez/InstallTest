@@ -18,18 +18,32 @@ permissions:
 
 env:
   source_directory: "src"
-  PYTHON_VERSIONS: ("3.10", "3.11", "3.12")
+  PYTHON_VERSIONS: '["3.10", "3.11", "3.12"]'
 
 jobs:
+  # ------------------------------------------------------------
+  # JOB 0: Setup (expose PYTHON_VERSIONS as a job output)
+  # ------------------------------------------------------------
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      python-versions: ${{ steps.set-versions.outputs.python-versions }}
+    steps:
+      - name: Expose Python versions
+        id: set-versions
+        run: echo "python-versions=$PYTHON_VERSIONS" >> "$GITHUB_OUTPUT"
+
   # ------------------------------------------------------------
   # JOB 1: Test
   # ------------------------------------------------------------
   test:
     name: Test
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ env.PYTHON_VERSIONS }}
+        python-version: ${{ fromJson(needs.setup.outputs.python-versions) }}
 
     steps:
       - name: Checkout Code
@@ -59,10 +73,11 @@ jobs:
   # ------------------------------------------------------------
   static-analysis:
     name: Static Analysis
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ fromJson(env.PYTHON_VERSIONS) }}
+        python-version: ${{ fromJson(needs.setup.outputs.python-versions) }}
 
     steps:
       - name: Checkout Code
