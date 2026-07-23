@@ -1,0 +1,202 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "$source_directory/**"
+      - ".github/workflows/build-python.yml"
+  pull_request:
+    paths:
+      - "$source_directory/**"
+      - ".github/workflows/build-python.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  checks: write
+
+env:
+  source_directory: "src"
+  PYTHON_VERSIONS: '["3.12", "3.13", "3.14"]'
+
+jobs:
+  # ------------------------------------------------------------
+  # JOB 0: Setup (expose PYTHON_VERSIONS as a job output)
+  # ------------------------------------------------------------
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      python-versions: ${{ steps.set-versions.outputs.python-versions }}
+    steps:
+      - name: Expose Python versions
+        id: set-versions
+        run: echo "python-versions=$PYTHON_VERSIONS" >> "$GITHUB_OUTPUT"
+
+  # ------------------------------------------------------------
+  # JOB 1: Test
+  # ------------------------------------------------------------
+  test:
+    name: Test
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(needs.setup.outputs.python-versions) }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip' # Automatically caches installed packages
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pytest-md pytest-emoji pytest-cov
+          # Install the package (and its runtime dependencies) from pyproject.toml
+          python -m pip install ./src/downloadblob
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Pytest
+        run: |
+          pytest --junitxml=pytest.xml
+  
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always() # Ensures reports publish even if tests fail
+        with:
+          files: |
+            pytest.xml
+
+  # ------------------------------------------------------------
+  # JOB 2: Static Analysis
+  # ------------------------------------------------------------
+  static-analysis:
+    name: Static Analysis
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(needs.setup.outputs.python-versions) }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip' # Automatically caches installed packages
+
+      - name: Lint with flake8
+        uses: py-actions/flake8@v2
+
+      - name: Lint with Ruff
+        uses: astral-sh/ruff-action@v4.0.0
+
+  # ------------------------------------------------------------
+  # JOB 3: Security Analysis
+  # ------------------------------------------------------------
+  security-analysis:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Perform Bandit Analysis
+        uses: PyCQA/bandit-action@v1
+
+  # ------------------------------------------------------------
+  # JOB 4: Build Package
+  # ------------------------------------------------------------
+  build:
+    name: Build Package
+    needs: [test, static-analysis, security-analysis]
+    # Only build on main branch pushes or tag creation to save compute
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Build Tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build Source and Wheel Distributions
+        run: |
+          python -m build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  # ------------------------------------------------------------
+  # JOB 5: Publish to PyPI
+  # ------------------------------------------------------------
+  publish:
+    name: Publish to PyPI
+    needs: [build]
+    # Only publish when a semantic version tag (e.g., v1.0.0) is pushed
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    
+    # Required permissions for PyPI Trusted Publishing (OIDC tokens)
+    permissions:
+      id-token: write
+
+    environment:
+      name: pypi
+      url: https://pypi.org
+
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish Package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ------------------------------------------------------------
+  # JOB 6: Create GitHub Release
+  # ------------------------------------------------------------
+  create-release:
+    name: Create GitHub Release
+    needs: [build]
+    # Only create a release when a semantic version tag (e.g., v1.0.0) is pushed
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false

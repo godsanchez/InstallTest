@@ -1,0 +1,43 @@
+name: Python Static Analysis
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Fetch your repository code
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Set up the Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip' # Speeds up subsequent runs if using a requirements file
+
+    # 3. Install the required static analysis tools
+    - name: Install Analysis Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff mypy bandit
+
+    # 4. Check for syntax, style, and programming errors
+    - name: Run Ruff Linter
+      run: ruff check .
+
+    # 5. Check code formatting
+    - name: Run Ruff Format Check
+      run: ruff format --check .
+
+    # 6. Verify type safety
+    - name: Run Mypy Type Checker
+      run: mypy . --ignore-missing-imports
+
+    # 7. Scan for security vulnerabilities
+    - name: Run Bandit Security Scanner
+      run: bandit -r . -x ./tests
